@@ -2,6 +2,7 @@ import re
 from pathlib import Path
 
 from fastapi import HTTPException
+from sqlalchemy import insert, update
 from sqlalchemy.orm import Session
 
 from backend.database.models import ExpenseBudgetDetail, SalesBudgetDetail, UploadCheckResult, UploadedFile
@@ -61,44 +62,11 @@ def clear_file_details(file_id: int, db: Session) -> None:
 
 
 def write_parsed_budget(parsed: ParsedBudget, db: Session) -> tuple[int, int]:
-    sales_rows = [
-        SalesBudgetDetail(
-            year=row.year,
-            month=row.month,
-            group_code=row.group_code,
-            group_name=row.group_name,
-            shop_code=row.shop_code,
-            shop_name=row.shop_name,
-            product_code=row.product_code,
-            product_name=row.product_name,
-            category=row.category,
-            budget_quantity=row.budget_quantity,
-            average_price=row.average_price,
-            budget_sales_amount=row.budget_sales_amount,
-            cost_price=row.cost_price,
-            budget_cost_amount=row.budget_cost_amount,
-            budget_gross_profit=row.budget_gross_profit,
-            source_file_id=row.source_file_id,
-            budget_version=row.budget_version,
-        )
-        for row in parsed.sales_rows
-    ]
-    expense_rows = [
-        ExpenseBudgetDetail(
-            year=row.year,
-            month=row.month,
-            group_code=row.group_code,
-            shop_code=row.shop_code,
-            expense_category=row.expense_category,
-            expense_item=row.expense_item,
-            budget_expense_amount=row.budget_expense_amount,
-            source_file_id=row.source_file_id,
-            budget_version=row.budget_version,
-        )
-        for row in parsed.expense_rows
-    ]
-    db.add_all(sales_rows + expense_rows)
-    return len(sales_rows), len(expense_rows)
+    if parsed.sales_rows:
+        db.execute(insert(SalesBudgetDetail), [vars(row) for row in parsed.sales_rows], execution_options={"render_nulls": True})
+    if parsed.expense_rows:
+        db.execute(insert(ExpenseBudgetDetail), [vars(row) for row in parsed.expense_rows])
+    return len(parsed.sales_rows), len(parsed.expense_rows)
 
 
 def import_budget_file(file_id: int, db: Session, force: bool = False) -> dict:
@@ -107,8 +75,6 @@ def import_budget_file(file_id: int, db: Session, force: bool = False) -> dict:
         raise HTTPException(status_code=404, detail="未找到上传文件记录。")
     try:
         year, group_code, shop_code = ensure_import_allowed(uploaded_file, db, force)
-        if force:
-            clear_file_details(file_id, db)
         parsed = parse_budget_workbook(
             Path(uploaded_file.file_path),
             file_id=file_id,
@@ -119,8 +85,17 @@ def import_budget_file(file_id: int, db: Session, force: bool = False) -> dict:
             shop_name=uploaded_file.shop_name,
             budget_version=uploaded_file.budget_version,
         )
+        claim = update(UploadedFile).where(
+            UploadedFile.id == file_id,
+            UploadedFile.check_status.in_(CHECK_PASS_STATUSES),
+        )
+        if not force:
+            claim = claim.where(UploadedFile.import_status != "已入库")
+        if db.execute(claim.values(import_status="已入库")).rowcount != 1:
+            raise HTTPException(status_code=409, detail="文件的检查或入库状态已变化，请刷新列表。")
+        if force:
+            clear_file_details(file_id, db)
         sales_count, expense_count = write_parsed_budget(parsed, db)
-        uploaded_file.import_status = "已入库"
         db.commit()
         return {
             "file_id": file_id,
@@ -130,13 +105,12 @@ def import_budget_file(file_id: int, db: Session, force: bool = False) -> dict:
             "message": "预算表已成功解析并入库",
         }
     except HTTPException:
-        uploaded_file.import_status = "入库失败"
-        db.commit()
+        db.rollback()
         raise
     except Exception as exc:
         db.rollback()
         uploaded_file = db.get(UploadedFile, file_id)
-        if uploaded_file:
+        if uploaded_file and uploaded_file.import_status != "已入库":
             uploaded_file.import_status = "入库失败"
             db.commit()
         raise HTTPException(status_code=500, detail=f"预算表入库失败：{exc}") from exc

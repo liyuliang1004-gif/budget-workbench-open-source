@@ -35,6 +35,6 @@ export function getDashboardWidgetCatalog() {
   return apiGet<DashboardWidgetCatalog>("/api/dashboard/widget-catalog");
 }
 
-export function getDashboardWidgetsData(payload: { filters: Record<string, string | number | undefined>; widgets: DashboardLayoutConfig["widgets"] }) {
-  return apiPost<DashboardWidgetsDataResponse>("/api/dashboard/widgets/data", payload);
+export function getDashboardWidgetsData(payload: { filters: Record<string, string | number | undefined>; widgets: DashboardLayoutConfig["widgets"] }, signal?: AbortSignal) {
+  return apiPost<DashboardWidgetsDataResponse>("/api/dashboard/widgets/data", payload, signal);
 }

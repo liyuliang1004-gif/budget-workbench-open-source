@@ -43,14 +43,16 @@ def check_file_calculation(file_id: int, db: Session = Depends(get_db)) -> dict:
 @router.post("/full/{file_id}")
 def check_file_full(file_id: int, db: Session = Depends(get_db)) -> dict:
     steps = []
+    workbook_cache = {}
     for check_name, runner in [
         ("format", run_format_check),
         ("formula", run_formula_check),
         ("calculation", run_calculation_check),
     ]:
         try:
-            steps.append(runner(file_id, db))
+            steps.append(runner(file_id, db, workbook_cache=workbook_cache))
         except Exception as exc:
+            db.rollback()
             steps.append(
                 {
                     "file_id": file_id,

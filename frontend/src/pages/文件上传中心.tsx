@@ -25,10 +25,10 @@ export default function 文件上传中心() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const refresh = () => {
-    getUploadedFiles().then(setFiles).catch((error) => setMessage(error.message));
-    getActualBatches().then(setActualBatches).catch(() => undefined);
-  };
+  const refresh = () => Promise.all([
+    getUploadedFiles().then(setFiles).catch((error) => setMessage(error.message)),
+    getActualBatches().then(setActualBatches).catch(() => undefined),
+  ]);
   useEffect(() => {
     refresh();
     getGroupsShops()
@@ -53,7 +53,7 @@ export default function 文件上传中心() {
   const actualImportedCount = actualBatches.filter((batch) => batch.status === "imported").length;
 
   async function upload() {
-    if (!selectedFile) return;
+    if (loading || !selectedFile) return;
     if (!budgetYear || !groupCode || !shopCode) {
       setMessage("请先选择年度、运营组和店铺，再上传预算表。");
       return;
@@ -73,7 +73,7 @@ export default function 文件上传中心() {
   }
 
   async function uploadActual() {
-    if (!actualFile) return;
+    if (loading || !actualFile) return;
     if (!actualYear || !actualGroupCode || !actualShopCode) {
       setMessage("请先选择年度、运营组和店铺，再上传实际经营表。");
       return;
@@ -84,7 +84,7 @@ export default function 文件上传中心() {
       await uploadActualFile(actualFile, actualYear, actualType, actualGroupCode, actualShopCode);
       setMessage(`${actualYear} 年${actualType === "sales" ? "实际销售表" : "实际费用表"}上传成功。下一步：在实际经营文件列表点击“检查”，检查通过后点击“入库”，首页预算 vs 实际会自动纳入该数据。`);
       setActualFile(null);
-      refresh();
+      await refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "实际经营表上传失败");
     } finally {
@@ -97,8 +97,15 @@ export default function 文件上传中心() {
   }
 
   async function action(label: string, task: () => Promise<unknown>) {
+    if (loading) return;
+    setLoading(true);
+    setMessage(`${label}进行中，请稍候…`);
     try {
       const result = await task() as Record<string, unknown> | undefined;
+      const failedStep = Array.isArray(result?.steps) ? result.steps.find((step) => step.status === "检查异常") : undefined;
+      if (failedStep) {
+        throw new Error(`检查未完成：${failedStep.message}`);
+      }
       const detail = result && ("error_count" in result || "warning_count" in result)
         ? `：错误 ${result.error_count || 0}，提醒 ${result.warning_count || 0}`
         : "";
@@ -106,6 +113,8 @@ export default function 文件上传中心() {
       await refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : `${label}失败`);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -237,10 +246,10 @@ export default function 文件上传中心() {
               title: "操作",
               render: (row) => (
                 <div className="button-row compact-actions">
-                  <button onClick={() => action("实际表检查", () => checkActualBatch(String(row.batch_id)))}>检查</button>
-                  <button onClick={() => action("查看检查结果", () => checkActualBatch(String(row.batch_id)))}>查看结果</button>
-                  <button disabled={Number(row.error_count || 0) > 0 || row.status === "imported"} onClick={() => window.confirm("确认将该实际经营表入库？入库后会影响预算实际对比。") && action("实际表入库", () => importActualBatch(String(row.batch_id)))}>入库</button>
-                  <button className="danger" onClick={() => window.confirm(row.status === "imported" ? "确认删除该实际经营表及其已入库数据？删除后首页预算实际对比会变化。" : "确认删除该未入库实际经营表？") && action("删除实际表", () => deleteActualBatch(String(row.batch_id)))}>删除</button>
+                  <button disabled={loading} onClick={() => action("实际表检查", () => checkActualBatch(String(row.batch_id)))}>检查</button>
+                  <button disabled={loading} onClick={() => action("查看检查结果", () => checkActualBatch(String(row.batch_id)))}>查看结果</button>
+                  <button disabled={loading || Number(row.error_count || 0) > 0 || row.status === "imported"} onClick={() => window.confirm("确认将该实际经营表入库？入库后会影响预算实际对比。") && action("实际表入库", () => importActualBatch(String(row.batch_id)))}>入库</button>
+                  <button disabled={loading} className="danger" onClick={() => window.confirm(row.status === "imported" ? "确认删除该实际经营表及其已入库数据？删除后首页预算实际对比会变化。" : "确认删除该未入库实际经营表？") && action("删除实际表", () => deleteActualBatch(String(row.batch_id)))}>删除</button>
                 </div>
               )
             }
@@ -273,10 +282,10 @@ export default function 文件上传中心() {
               title: "操作",
               render: (row) => (
                 <div className="button-row compact-actions">
-                  <button onClick={() => action("格式检查", () => runFormatCheck(Number(row.id)))}>格式检查</button>
-                  <button onClick={() => action("全流程检查", () => runFullCheck(Number(row.id)))}>全流程</button>
-                  <button disabled={!canImport(row)} onClick={() => window.confirm("确认将该预算表入库？入库后会影响汇总结果。") && action("入库", () => importBudgetFile(Number(row.id)))}>入库</button>
-                  <button className="danger" onClick={() => window.confirm(row.import_status === "已入库" ? "确认删除该文件及其已入库明细，并自动重算汇总？" : "确认删除该上传文件？") && action("删除", () => deleteUploadedFile(Number(row.id)))}>删除</button>
+                  <button disabled={loading} onClick={() => action("格式检查", () => runFormatCheck(Number(row.id)))}>格式检查</button>
+                  <button disabled={loading} onClick={() => action("全流程检查", () => runFullCheck(Number(row.id)))}>全流程</button>
+                  <button disabled={loading || !canImport(row)} onClick={() => window.confirm("确认将该预算表入库？入库后会影响汇总结果。") && action("入库", () => importBudgetFile(Number(row.id)))}>入库</button>
+                  <button disabled={loading} className="danger" onClick={() => window.confirm(row.import_status === "已入库" ? "确认删除该文件及其已入库明细，并自动重算汇总？" : "确认删除该上传文件？") && action("删除", () => deleteUploadedFile(Number(row.id)))}>删除</button>
                 </div>
               )
             }

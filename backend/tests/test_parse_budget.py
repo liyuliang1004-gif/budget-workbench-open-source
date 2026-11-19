@@ -1,6 +1,32 @@
 from openpyxl import Workbook
 
+from backend.services.budget_workbook import load_budget_workbook
 from backend.services.parse_budget_service import parse_budget_workbook
+
+
+def test_budget_workbook_skips_empty_formatting_and_keeps_validation_metadata(tmp_path):
+    path = tmp_path / "formatted.xlsx"
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "任务分解-金额"
+    sheet["B2"] = 100
+    sheet["C2"] = "=B2*2"
+    sheet["XFD1048575"].number_format = "0.00"
+    sheet.row_dimensions[3].hidden = True
+    sheet.column_dimensions["D"].hidden = True
+    sheet.merge_cells("A1:B1")
+    workbook.create_sheet("额外工作表")["A1"] = "不参与入库"
+    workbook.save(path)
+
+    parsed = load_budget_workbook(path, data_only=False)
+    result = parsed[sheet.title]
+    assert result.max_row == 2
+    assert result.max_column == 3
+    assert result["B2"].value == 100
+    assert result["C2"].value == "=B2*2"
+    assert result.row_dimensions[3].hidden and result.column_dimensions["D"].hidden
+    assert "A1:B1" in result.merged_cells
+    assert "额外工作表" in parsed.sheetnames
 
 
 def create_budget_workbook(path):

@@ -1,7 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass, replace
 
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Query, Session
 
 from backend.database.models import ActualExpenseDetail, ActualSalesDetail, ExpenseBudgetDetail, SalesBudgetDetail
@@ -563,8 +563,12 @@ def health_insights(values: dict, data_view: str) -> list[dict]:
 
 def product_options(db: Session, ctx: DashboardContext) -> list[dict]:
     option_ctx = replace(ctx, product_code=None, product_name=None)
-    budget_rows = apply_budget_sales_filters(db.query(SalesBudgetDetail), option_ctx).all()
-    actual_rows = apply_actual_sales_filters(db.query(ActualSalesDetail), option_ctx).all()
+    budget_rows = apply_budget_sales_filters(
+        db.query(SalesBudgetDetail.product_code, SalesBudgetDetail.product_name), option_ctx
+    ).group_by(SalesBudgetDetail.product_code, SalesBudgetDetail.product_name).order_by(func.max(SalesBudgetDetail.id)).all()
+    actual_rows = apply_actual_sales_filters(
+        db.query(ActualSalesDetail.product_code, ActualSalesDetail.product_name), option_ctx
+    ).group_by(ActualSalesDetail.product_code, ActualSalesDetail.product_name).order_by(func.min(ActualSalesDetail.id)).all()
     options = {}
     for row in budget_rows:
         name = row.product_name or row.product_code
@@ -638,13 +642,13 @@ def dashboard_overview(db: Session, filters: dict, app_state=None) -> dict:
     product_scoped = bool(ctx.product_code or ctx.product_name)
     budget_expense_rows = [] if product_scoped else apply_budget_expense_filters(db.query(ExpenseBudgetDetail), ctx).all()
     actual_expense_rows = [] if product_scoped else apply_actual_expense_filters(db.query(ActualExpenseDetail), ctx).all()
-    annual_ctx = replace(ctx, month=None)
-    annual_budget_rows = apply_budget_sales_filters(db.query(SalesBudgetDetail), annual_ctx).all()
+    annual_budget_rows = budget_rows
+    if ctx.month is not None:
+        annual_budget_rows = apply_budget_sales_filters(db.query(SalesBudgetDetail), replace(ctx, month=None)).all()
     coverage = actual_coverage(actual_rows, actual_expense_rows)
     months = same_period_months(ctx, actual_rows, actual_expense_rows)
-    same_period_ctx = replace(ctx, month=None)
-    same_period_budget_rows = apply_budget_sales_filters(db.query(SalesBudgetDetail), same_period_ctx).filter(SalesBudgetDetail.month.in_(months)).all()
-    comparison_budget_rows = rows_for_months(budget_rows, months) if ctx.data_view == "comparison" else budget_rows
+    same_period_budget_rows = rows_for_months(annual_budget_rows, months)
+    comparison_budget_rows = same_period_budget_rows if ctx.data_view == "comparison" else budget_rows
     comparison_budget_expense_rows = rows_for_months(budget_expense_rows, months) if ctx.data_view == "comparison" else budget_expense_rows
     summary_values = build_summary_values(
         sales_totals(comparison_budget_rows, "budget"),

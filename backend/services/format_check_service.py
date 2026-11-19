@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from sqlalchemy.orm import Session
 
 from backend.database.models import UploadCheckResult, UploadedFile
+from backend.services.budget_workbook import load_budget_workbook
 
 REQUIRED_SHEETS = [
     "任务分解-数量",
@@ -377,15 +377,10 @@ def build_issue_rows(file_id: int, issues: list[CheckIssue]) -> list[UploadCheck
     ]
 
 
-def run_format_check(file_id: int, db: Session) -> dict:
+def run_format_check(file_id: int, db: Session, *, workbook_cache=None) -> dict:
     uploaded_file = db.get(UploadedFile, file_id)
     if uploaded_file is None:
         raise ValueError("未找到上传文件记录。")
-
-    db.query(UploadCheckResult).filter(
-        UploadCheckResult.file_id == file_id,
-        UploadCheckResult.check_type == "format",
-    ).delete()
 
     issues: list[CheckIssue] = []
     file_path = Path(uploaded_file.file_path)
@@ -408,7 +403,7 @@ def run_format_check(file_id: int, db: Session) -> dict:
 
     if not any(issue.severity == "error" for issue in issues):
         try:
-            workbook = load_workbook(file_path, data_only=False)
+            workbook = load_budget_workbook(file_path, data_only=False, cache=workbook_cache)
         except Exception as exc:
             add_file_issue(issues, "error", "FILE_OPEN_FAILED", f"文件无法打开：{exc}", "请确认文件未损坏且为标准 .xlsx。")
             workbook = None
@@ -449,6 +444,10 @@ def run_format_check(file_id: int, db: Session) -> dict:
                 headers, month_columns = check_headers(ws, issues)
                 check_required_data(ws, headers, month_columns, issues)
 
+    db.query(UploadCheckResult).filter(
+        UploadCheckResult.file_id == file_id,
+        UploadCheckResult.check_type == "format",
+    ).delete()
     issue_rows = build_issue_rows(file_id, issues)
     if issue_rows:
         db.add_all(issue_rows)

@@ -2,11 +2,11 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 from sqlalchemy.orm import Session
 
 from backend.config import BASE_DIR
+from backend.services.budget_workbook import load_budget_workbook
 from backend.database.models import UploadCheckResult, UploadedFile
 from backend.services.check_status_service import update_file_check_status
 from backend.services.format_check_service import find_headers, find_month_columns
@@ -156,21 +156,16 @@ def scan_sheet_formulas(ws, rule: dict, issues: list[FormulaIssue]) -> None:
                 )
 
 
-def run_formula_check(file_id: int, db: Session) -> dict:
+def run_formula_check(file_id: int, db: Session, *, workbook_cache=None) -> dict:
     uploaded_file = db.get(UploadedFile, file_id)
     if uploaded_file is None:
         raise ValueError("未找到上传文件记录。")
-
-    db.query(UploadCheckResult).filter(
-        UploadCheckResult.file_id == file_id,
-        UploadCheckResult.check_type == "formula",
-    ).delete()
 
     issues: list[FormulaIssue] = []
     rules = load_formula_rules()
     file_path = Path(uploaded_file.file_path)
     try:
-        workbook = load_workbook(file_path, data_only=False)
+        workbook = load_budget_workbook(file_path, data_only=False, cache=workbook_cache)
     except Exception as exc:
         issues.append(
             FormulaIssue(
@@ -198,6 +193,10 @@ def run_formula_check(file_id: int, db: Session) -> dict:
                 continue
             scan_sheet_formulas(workbook[sheet_name], rule, issues)
 
+    db.query(UploadCheckResult).filter(
+        UploadCheckResult.file_id == file_id,
+        UploadCheckResult.check_type == "formula",
+    ).delete()
     add_issue_rows(file_id, issues, db)
     db.commit()
     status = update_file_check_status(file_id, db)

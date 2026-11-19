@@ -91,7 +91,7 @@ def cell_value(row, headers: dict[str, int], name: str):
     return row[column_index - 1]
 
 
-async def save_actual_upload(
+def save_actual_upload(
     file: UploadFile,
     db: Session,
     app_state,
@@ -113,7 +113,7 @@ async def save_actual_upload(
     upload_dir.mkdir(parents=True, exist_ok=True)
     saved_path = upload_dir / build_saved_file_name(original_file_name)
     with saved_path.open("wb") as output:
-        while chunk := await file.read(1024 * 1024):
+        while chunk := file.file.read(1024 * 1024):
             output.write(chunk)
     batch = ActualImportBatch(
         batch_id=uuid4().hex,

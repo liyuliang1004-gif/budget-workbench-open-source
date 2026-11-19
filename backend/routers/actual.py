@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api/actual", tags=["actual"])
 
 
 @router.post("/upload-sales")
-async def upload_actual_sales(
+def upload_actual_sales(
     request: Request,
     file: UploadFile = File(...),
     year: int = Form(...),
@@ -23,12 +23,12 @@ async def upload_actual_sales(
     shop_code: str | None = Form(None),
     db: Session = Depends(get_db),
 ) -> dict:
-    batch = await save_actual_upload(file, db, request.app.state, year, "actual_sales", group_code, shop_code)
+    batch = save_actual_upload(file, db, request.app.state, year, "actual_sales", group_code, shop_code)
     return serialize_batch(batch)
 
 
 @router.post("/upload-expense")
-async def upload_actual_expense(
+def upload_actual_expense(
     request: Request,
     file: UploadFile = File(...),
     year: int = Form(...),
@@ -36,7 +36,7 @@ async def upload_actual_expense(
     shop_code: str | None = Form(None),
     db: Session = Depends(get_db),
 ) -> dict:
-    batch = await save_actual_upload(file, db, request.app.state, year, "actual_expense", group_code, shop_code)
+    batch = save_actual_upload(file, db, request.app.state, year, "actual_expense", group_code, shop_code)
     return serialize_batch(batch)
 
 

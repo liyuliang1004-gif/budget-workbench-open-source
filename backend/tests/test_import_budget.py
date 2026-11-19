@@ -139,6 +139,9 @@ def test_checked_file_can_be_imported_and_duplicate_is_rejected(tmp_path):
         duplicate = client.post(f"/api/import/{file_id}")
         assert duplicate.status_code == 400
         assert "已入库" in duplicate.json()["detail"]
+        with db_factory() as db:
+            assert db.get(UploadedFile, file_id).import_status == "已入库"
+            assert db.query(SalesBudgetDetail).filter_by(source_file_id=file_id).count() == 12
     finally:
         cleanup_test_client()
 

@@ -79,7 +79,11 @@ export default function 首页总览({ onAiOpen = () => undefined }: { onAiOpen?
           setMessage("首页配置异常，已使用默认布局。");
         }
       })
-      .catch((error) => setMessage(error instanceof Error ? error.message : "首页配置加载失败"));
+      .catch((error) => {
+        if (!alive) return;
+        setLoading(false);
+        setMessage(error instanceof Error ? error.message : "首页配置加载失败");
+      });
     return () => {
       alive = false;
     };
@@ -99,25 +103,33 @@ export default function 首页总览({ onAiOpen = () => undefined }: { onAiOpen?
   useEffect(() => {
     if (!layout) return;
     let alive = true;
+    const controller = new AbortController();
     setLoading(true);
     setMessage("");
-    getDashboardWidgetsData({ filters: overviewParams, widgets: layout.widgets })
-      .then((data) => {
-        if (!alive) return;
-        setOverview(data.overview);
-        setWidgetData(data.widgets);
-      })
-      .catch((error) => {
-        if (!alive) return;
-        setOverview(null);
-        setWidgetData([]);
-        setMessage(error instanceof Error ? error.message : "首页数据加载失败");
-      })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
+    const timer = window.setTimeout(() => {
+      getDashboardWidgetsData(
+        { filters: overviewParams, widgets: layout.widgets },
+        controller.signal,
+      )
+        .then((data) => {
+          if (!alive) return;
+          setOverview(data.overview);
+          setWidgetData(data.widgets);
+        })
+        .catch((error) => {
+          if (!alive) return;
+          setOverview(null);
+          setWidgetData([]);
+          setMessage(error instanceof Error ? error.message : "首页数据加载失败");
+        })
+        .finally(() => {
+          if (alive) setLoading(false);
+        });
+    }, 150);
     return () => {
       alive = false;
+      window.clearTimeout(timer);
+      controller.abort();
     };
   }, [overviewParams, refreshKey, layout]);
 
@@ -203,7 +215,7 @@ export default function 首页总览({ onAiOpen = () => undefined }: { onAiOpen?
 
   return (
     <div className="dashboard-page">
-      {!loading && overview && <ViewModeHeader overview={overview} />}
+      {overview && <ViewModeHeader overview={overview} />}
       <DashboardFilterBar
         filters={filters}
         groups={groups}
@@ -216,9 +228,9 @@ export default function 首页总览({ onAiOpen = () => undefined }: { onAiOpen?
       />
       {configOpen && catalog && layout && <DashboardConfigModal catalog={catalog} layout={layout} onClose={() => setConfigOpen(false)} onSave={saveLayout} onReset={resetLayout} />}
       {message && <div className="notice">{message}</div>}
-      {loading && <LoadingSkeleton />}
+      {loading && !overview && <LoadingSkeleton />}
       {!loading && !overview && <EmptyState text="暂无经营总览数据。" />}
-      {!loading && overview && (
+      {overview && (
         <section className="dashboard-configured-stack">
           {masonryBlocks.map((block, index) => block.kind === "full" ? (
             <div className="dashboard-masonry-full" key={`full-${block.widget.id}-${index}`}>

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { getSettings } from "./api/settingsApi";
 import { getVersion } from "./api/versionApi";
 import Layout_v2 from "./components_v2/Layout_v2";
-import decorateChips_v2 from "./components_v2/decorateChips_v2";
 import Modal from "./components/Modal";
 import AI经营分析 from "./pages/AI经营分析";
 import 上传检查中心 from "./pages/上传检查中心";
@@ -54,8 +53,6 @@ export default function App_v2() {
       delete document.documentElement.dataset.ui;
     };
   }, [theme]);
-
-  useEffect(() => decorateChips_v2(document.body, { once: false }), [page]);
 
   useEffect(() => {
     getVersion().then(setVersion).catch(() => setVersion(null));

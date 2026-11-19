@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/upload", tags=["upload"])
 
 
 @router.post("/budget")
-async def upload_budget_file(
+def upload_budget_file(
     request: Request,
     file: UploadFile = File(...),
     budget_year: int = Form(...),
@@ -22,7 +22,7 @@ async def upload_budget_file(
     shop_code: str = Form(...),
     db: Session = Depends(get_db),
 ) -> dict:
-    uploaded_file = await save_budget_upload(
+    uploaded_file = save_budget_upload(
         file,
         db,
         request.app.state,

@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 from sqlalchemy.orm import Session
 
 from backend.config import AMOUNT_TOLERANCE
 from backend.database.models import UploadCheckResult, UploadedFile
+from backend.services.budget_workbook import load_budget_workbook
 from backend.services.check_status_service import update_file_check_status
 from backend.services.format_check_service import find_field, find_headers, find_month_columns, has_value
 
@@ -482,21 +482,16 @@ def check_profit(wb, monthly_sales: dict[int, float], monthly_cost: dict[int, fl
     check_year_total(ws, issues, "利润分解表")
 
 
-def run_calculation_check(file_id: int, db: Session) -> dict:
+def run_calculation_check(file_id: int, db: Session, *, workbook_cache=None) -> dict:
     uploaded_file = db.get(UploadedFile, file_id)
     if uploaded_file is None:
         raise ValueError("未找到上传文件记录。")
 
-    db.query(UploadCheckResult).filter(
-        UploadCheckResult.file_id == file_id,
-        UploadCheckResult.check_type == "calculation",
-    ).delete()
-
     issues: list[CalculationIssue] = []
     try:
         file_path = Path(uploaded_file.file_path)
-        wb = load_workbook(file_path, data_only=True)
-        formula_wb = load_workbook(file_path, data_only=False)
+        wb = load_budget_workbook(file_path, data_only=True, cache=workbook_cache)
+        formula_wb = load_budget_workbook(file_path, data_only=False, cache=workbook_cache)
     except Exception as exc:
         issues.append(
             CalculationIssue(
@@ -517,6 +512,10 @@ def run_calculation_check(file_id: int, db: Session) -> dict:
         check_profit(wb, monthly_sales, monthly_cost, monthly_expenses, issues, formula_wb)
         check_workbook_self_totals(wb, monthly_sales, monthly_cost, monthly_expenses, issues)
 
+    db.query(UploadCheckResult).filter(
+        UploadCheckResult.file_id == file_id,
+        UploadCheckResult.check_type == "calculation",
+    ).delete()
     add_issue_rows(file_id, issues, db)
     db.commit()
     status = update_file_check_status(file_id, db)

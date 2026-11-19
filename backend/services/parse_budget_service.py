@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
+from backend.services.budget_workbook import load_budget_workbook
 from backend.services.calculation_check_service import to_number
 from backend.services.format_check_service import MONTH_ALIASES, find_field, find_headers, find_month_columns, has_value, normalize_header
 
@@ -316,7 +316,7 @@ def parse_budget_workbook(
     shop_name: str | None,
     budget_version: int = 1,
 ) -> ParsedBudget:
-    workbook = load_workbook(file_path, data_only=True)
+    workbook = load_budget_workbook(file_path, data_only=True)
     return ParsedBudget(
         sales_rows=parse_sales_rows(workbook, file_id, year, group_code, group_name, shop_code, shop_name, budget_version),
         expense_rows=parse_expense_rows(workbook, file_id, year, group_code, shop_code, budget_version),

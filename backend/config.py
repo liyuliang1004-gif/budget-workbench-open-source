@@ -9,7 +9,7 @@ FRONTEND_DIST_DIR = resolve_frontend_dist_dir(BASE_DIR)
 
 SYSTEM_NAME = "经营工作台"
 PROJECT_NAME = SYSTEM_NAME
-VERSION = "1.0.0"
+VERSION = "0.1.4"
 CURRENT_STAGE = "本地可视化工作台"
 
 DATABASE_RELATIVE_PATH = data_reference(BASE_DIR, DATA_DIR, "database/budget_system.db")

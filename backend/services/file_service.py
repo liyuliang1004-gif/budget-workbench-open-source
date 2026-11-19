@@ -67,7 +67,7 @@ def normalize_budget_year(value: int | str | None) -> int:
     return year
 
 
-async def save_budget_upload(
+def save_budget_upload(
     file: UploadFile,
     db: Session,
     app_state=None,
@@ -86,11 +86,13 @@ async def save_budget_upload(
     saved_file_name = build_saved_file_name(original_file_name)
     saved_path = upload_dir / saved_file_name
 
+    digest = sha256()
     with saved_path.open("wb") as output:
-        while chunk := await file.read(1024 * 1024):
+        while chunk := file.file.read(1024 * 1024):
             output.write(chunk)
+            digest.update(chunk)
 
-    file_hash = calculate_file_hash(saved_path)
+    file_hash = digest.hexdigest()
     uploaded_file = UploadedFile(
         file_name=original_file_name,
         file_path=str(saved_path),

@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 pandas
-openpyxl
+openpyxl==3.1.5
 sqlalchemy
 pydantic
 python-multipart
