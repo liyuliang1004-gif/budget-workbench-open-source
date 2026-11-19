@@ -1,0 +1,196 @@
+* { box-sizing: border-box; }
+
+[data-ui="v2"] body {
+  margin: 0;
+  background: var(--v2-bg);
+  color: var(--v2-text);
+  font-family: var(--v2-font);
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+[data-ui="v2"] button,
+[data-ui="v2"] input,
+[data-ui="v2"] select,
+[data-ui="v2"] textarea {
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+[data-ui="v2"] button {
+  border: 1px solid var(--v2-border);
+  border-radius: var(--v2-radius-sm);
+  padding: 8px 14px;
+  min-height: 36px;
+  background: var(--v2-surface);
+  color: var(--v2-text-2);
+  cursor: pointer;
+  box-shadow: var(--v2-shadow-sm);
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+[data-ui="v2"] button:hover:not(:disabled) {
+  border-color: var(--v2-border-strong);
+  background: var(--v2-surface-2);
+}
+
+[data-ui="v2"] button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+[data-ui="v2"] button.primary,
+[data-ui="v2"] button.v2-primary {
+  background: var(--v2-primary);
+  color: #ffffff;
+  border-color: var(--v2-primary);
+  box-shadow: 0 1px 3px rgba(15, 118, 110, 0.2);
+}
+
+[data-ui="v2"] button.primary:hover:not(:disabled),
+[data-ui="v2"] button.v2-primary:hover:not(:disabled) {
+  background: var(--v2-primary-strong);
+  border-color: var(--v2-primary-strong);
+}
+
+[data-ui="v2"] button.secondary {
+  background: var(--v2-surface);
+  color: var(--v2-text-2);
+  border-color: var(--v2-border);
+  box-shadow: none;
+}
+
+[data-ui="v2"] button.secondary:hover:not(:disabled) {
+  background: var(--v2-surface-2);
+}
+
+[data-ui="v2"] button.danger {
+  background: var(--v2-danger);
+  color: #ffffff;
+  border-color: var(--v2-danger);
+}
+
+[data-ui="v2"] button.pill {
+  border-radius: var(--v2-radius-pill);
+}
+
+[data-ui="v2"] button.icon-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: var(--v2-radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-ui="v2"] button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+[data-ui="v2"] input,
+[data-ui="v2"] select,
+[data-ui="v2"] textarea {
+  border: 1px solid var(--v2-border);
+  background: var(--v2-surface);
+  color: var(--v2-text);
+  border-radius: var(--v2-radius-sm);
+  padding: 9px 12px;
+  min-width: 140px;
+  transition: all 0.15s ease;
+}
+
+[data-ui="v2"] input:focus,
+[data-ui="v2"] select:focus,
+[data-ui="v2"] textarea:focus {
+  border-color: var(--v2-primary-border);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12);
+}
+
+[data-ui="v2"] textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+[data-ui="v2"] table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--v2-surface);
+}
+
+[data-ui="v2"] th,
+[data-ui="v2"] td {
+  border-bottom: 1px solid var(--v2-border);
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+[data-ui="v2"] th {
+  color: var(--v2-muted);
+  background: var(--v2-surface-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+[data-ui="v2"] th:first-child {
+  border-top-left-radius: var(--v2-radius-sm);
+}
+
+[data-ui="v2"] th:last-child {
+  border-top-right-radius: var(--v2-radius-sm);
+}
+
+[data-ui="v2"] tr:last-child td {
+  border-bottom: none;
+}
+
+[data-ui="v2"] tbody tr:hover td {
+  background: var(--v2-surface-2);
+}
+
+[data-ui="v2"] td {
+  max-width: 320px;
+  overflow-wrap: anywhere;
+  color: var(--v2-text-2);
+}
+
+[data-ui="v2"] h1,
+[data-ui="v2"] h2,
+[data-ui="v2"] h3,
+[data-ui="v2"] h4 {
+  color: var(--v2-text);
+  margin: 0;
+}
+
+[data-ui="v2"] h1 { font-size: 24px; font-weight: 700; line-height: 1.25; }
+[data-ui="v2"] h2 { font-size: 18px; font-weight: 700; line-height: 1.35; }
+[data-ui="v2"] h3 { font-size: 15px; font-weight: 600; line-height: 1.4; }
+
+[data-ui="v2"] p {
+  margin: 0;
+  color: var(--v2-text-2);
+}
+
+[data-ui="v2"] a {
+  color: var(--v2-primary);
+  text-decoration: none;
+}
+
+[data-ui="v2"] a:hover {
+  text-decoration: underline;
+}
+
+[data-ui="v2"] .muted {
+  color: var(--v2-muted);
+}
+
+[data-ui="v2"] .text-success { color: var(--v2-success); }
+[data-ui="v2"] .text-warning { color: var(--v2-warning); }
+[data-ui="v2"] .text-danger { color: var(--v2-danger); }
+[data-ui="v2"] .text-primary { color: var(--v2-primary); }

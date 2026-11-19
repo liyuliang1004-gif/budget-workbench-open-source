@@ -1,0 +1,13 @@
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+button, input, select, textarea { font: inherit; }
+button { border: 1px solid var(--primary); border-radius: 6px; padding: 7px 11px; min-height: 32px; background: var(--primary); color: #fff; cursor: pointer; box-shadow: none; font-size: 13px; }
+button.secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+button.danger { background: var(--danger); }
+button:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+input, select, textarea { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 9px 10px; min-width: 140px; }
+textarea { min-height: 120px; resize: vertical; }
+table { width: 100%; border-collapse: collapse; background: var(--surface); }
+th, td { border-bottom: 1px solid var(--border); padding: 10px 12px; text-align: left; vertical-align: top; }
+th { color: var(--muted); background: var(--surface-2); font-size: 13px; }
+td { max-width: 280px; overflow-wrap: anywhere; }

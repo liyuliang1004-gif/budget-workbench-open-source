@@ -1,0 +1,302 @@
+/* ============================================================
+   主题变量_v2.css —— 1:1 对齐 5180 端口参考 UI
+   浅色主色：水鸭绿/青色 Teal #0d9488（参考AI助手/按钮高亮）
+   深色主色：审核金 #f59e0b
+   ============================================================ */
+
+:root {
+  /* Primary: Teal 水鸭绿 (13, 148, 136) */
+  --v2-primary: #0d9488;
+  --v2-primary-strong: #0f766e;
+  --v2-primary-weak: rgba(13, 148, 136, 0.08);
+  --v2-primary-border: #0d9488;
+
+  --v2-accent: #0d9488;
+  --v2-accent-weak: rgba(13, 148, 136, 0.08);
+
+  /* Semantic —— 参考 5180 真实色值 */
+  --v2-success: #22c55e;
+  --v2-success-weak: rgba(34, 197, 94, 0.12);
+  --v2-warning: #f59e0b;
+  --v2-warning-weak: #fef3c7;
+  --v2-danger: #ef4444;
+  --v2-danger-weak: rgba(239, 68, 68, 0.12);
+  --v2-info: #0ea5e9;
+  --v2-purple: #8b5cf6;
+
+  /* Neutrals —— 严格对齐 5180 参考 */
+  --v2-bg: #f5f8fc;
+  --v2-surface: #ffffff;
+  --v2-surface-2: #f8fafc;
+  --v2-surface-3: #f1f5f9;
+  --v2-border: #e2e8f0;
+  --v2-border-strong: #cbd5e1;
+  --v2-text: #0f172a;
+  --v2-text-2: #1e293b;
+  --v2-muted: #64748b;
+  --v2-muted-2: #94a3b8;
+
+  /* Filter & Control */
+  --v2-filter-bg: transparent;
+  --v2-control-bg: #ffffff;
+  --v2-control-surface: #f8fafc;
+  --v2-control-text: #0f172a;
+  --v2-dashboard-surface: transparent;
+  --v2-ai-modal-bg: #fffaf2;
+  --v2-ai-soft-bg: rgba(13, 148, 136, 0.08);
+
+  /* Sidebar —— 纯白 (参考 .sidebar bg: #fff) */
+  --v2-sidebar-bg: #ffffff;
+  --v2-sidebar-text: #0f172a;
+  --v2-sidebar-muted: #64748b;
+  --v2-sidebar-active-bg: #0d9488;
+  --v2-sidebar-active-text: #ffffff;
+  --v2-sidebar-active-indicator: #0d9488;
+  --v2-sidebar-border: #e2e8f0;
+  --v2-sidebar-divider: #e2e8f0;
+
+  /* Right panel（兼容但默认不显示） */
+  --v2-rightpanel-bg: #ffffff;
+  --v2-rightpanel-border: #e2e8f0;
+
+  /* Glow */
+  --v2-glow: rgba(13, 148, 136, .16);
+  --v2-sidebar-active-glow: 0 4px 12px rgba(13, 148, 136, .18);
+
+  /* ============================================================
+     语义装饰徽章 / 状态标签（点缀小图标+色块，不改变布局和逻辑）
+     4 类克制的点缀色，每类都绑定 emoji 图标 + 半透明浅底 + 细边框
+     ============================================================ */
+  /* 1. 完成率/达成率徽章（↑↓ 箭头 + 绿/红胶囊） */
+  --v2-chip-complete-bg: rgba(34, 197, 94, 0.1);
+  --v2-chip-complete-fg: #16a34a;
+  --v2-chip-complete-border: rgba(34, 197, 94, 0.28);
+  --v2-chip-down-bg: rgba(16, 185, 129, 0.08);
+  --v2-chip-down-fg: #0f766e;
+  --v2-chip-down-border: rgba(13, 148, 136, 0.22);
+  --v2-chip-drop-bg: rgba(239, 68, 68, 0.08);
+  --v2-chip-drop-fg: #dc2626;
+  --v2-chip-drop-border: rgba(239, 68, 68, 0.22);
+
+  /* 2. 警告偏低徽章（⚠️ + 黄底黄字） */
+  --v2-chip-warn-bg: #fff7db;
+  --v2-chip-warn-fg: #b45309;
+  --v2-chip-warn-border: rgba(245, 158, 11, 0.45);
+  --v2-chip-warn-icon: "⚠️";
+
+  /* 3. 信息标签框（📦实际件数 / 💰平均订单金额 / 📊销售数据 / 💵销售额 等图标+细边框） */
+  --v2-chip-info-bg: rgba(14, 165, 233, 0.06);
+  --v2-chip-info-fg: #0369a1;
+  --v2-chip-info-border: rgba(14, 165, 233, 0.28);
+  --v2-chip-tag-bg: rgba(16, 185, 129, 0.08);
+  --v2-chip-tag-fg: #065f46;
+  --v2-chip-tag-border: rgba(16, 185, 129, 0.3);
+  --v2-chip-purple-bg: rgba(139, 92, 246, 0.08);
+  --v2-chip-purple-fg: #6d28d9;
+  --v2-chip-purple-border: rgba(139, 92, 246, 0.28);
+  --v2-chip-amber-bg: rgba(245, 158, 11, 0.1);
+  --v2-chip-amber-fg: #92400e;
+  --v2-chip-amber-border: rgba(245, 158, 11, 0.32);
+
+  /* 4. 状态文本前的 emoji 图标前缀（成功/风险/通过/错误/说明等） */
+  --v2-icon-prefix-gap: 4px;
+
+  /* Rounded —— 参考真实测量
+     filter-btn 胶囊: 999px
+     dim-select / top-select: 4px
+     metric-card / chart-card: 12px
+     nav-item (sidebar): 4px
+     theme-toggle: 50% (圆)
+     ai-btn 胶囊: 999px */
+  --v2-radius-xs: 4px;
+  --v2-radius-sm: 6px;
+  --v2-radius-md: 12px;
+  --v2-radius-lg: 12px;
+  --v2-radius-pill: 999px;
+
+  /* Shadow —— 参考 chart-card box-shadow
+     rgba(15, 23, 42, 0.06) 0px 1px 3px 0px, rgba(15, 23, 42, 0.04) 0px 4px 12px 0px */
+  --v2-shadow-none: none;
+  --v2-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --v2-shadow-md: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.04);
+  --v2-shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.04);
+
+  /* Fonts */
+  --v2-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  /* Control 尺寸 —— 参考真实测量
+     dim-select / top-select: h 31.6875 ≈ 32px
+     filter-btn (视角/月份): h 27.7969 ≈ 28px
+     theme-toggle: 36x36
+     ai-btn: h 29.6875 ≈ 30px
+     metric-card: h ~116, pad 17.5px */
+  --v2-control-h-select: 32px;
+  --v2-control-h-btn: 28px;
+  --v2-control-h-theme: 36px;
+  --v2-control-h-ai: 30px;
+
+  /* Icons 背景分类（保留兼容，使用参考色系） */
+  --v2-icon-teal-bg: rgba(13, 148, 136, 0.08);
+  --v2-icon-teal-fg: #0d9488;
+  --v2-icon-blue-bg: #eff6ff;
+  --v2-icon-blue-fg: #2563eb;
+  --v2-icon-purple-bg: #f5f3ff;
+  --v2-icon-purple-fg: #8b5cf6;
+  --v2-icon-orange-bg: #fef3c7;
+  --v2-icon-orange-fg: #d97706;
+  --v2-icon-green-bg: #dcfce7;
+  --v2-icon-green-fg: #16a34a;
+  --v2-icon-red-bg: #fef2f2;
+  --v2-icon-red-fg: #ef4444;
+  --v2-icon-gray-bg: #f1f5f9;
+  --v2-icon-gray-fg: #64748b;
+  --v2-icon-amber-bg: #fef3c7;
+  --v2-icon-amber-fg: #f59e0b;
+
+  /* ============================================================
+     Chart 配色（V2 专属：统一到 UI 色系，浅 Pastel 化，不深不刺眼）
+     语义：
+     - primary (Teal 400~500 浅青水鸭)：费用/成本/使用进度/默认指标
+     - secondary (Slate 400 暖灰蓝)：预算/基线/对比柱（不抢戏）
+     - danger (Rose 400 浅玫瑰，替代原先 700 深正红)：超支/负差异/风险
+     - success (Emerald 400 浅翡翠绿)：节省/正向/良好/达标
+     - info (Sky 400 天蓝)：销售额/利润/收入排名柱（和 teal 区分但不冲突）
+     同时新增 "费用多色调色板"（柔和 Pastel 6 色）：
+       费用排名每一根柱子循环一套浅色系，不再清一色。
+     折线调色板整体降一阶 (600→400/500)，红不再正红。
+     ============================================================ */
+  --v2-chart-bar-primary: #2dd4bf;   /* Teal-400 浅青 */
+  --v2-chart-bar-secondary: #94a3b8; /* Slate-400 浅灰蓝 */
+  --v2-chart-bar-danger:  #fb7185;   /* Rose-400 浅玫瑰 (之前 #e11d48 Rose-700 正红太深) */
+  --v2-chart-bar-success: #34d399;   /* Emerald-400 浅翡翠 (之前 #059669 600 太深) */
+  --v2-chart-bar-info:    #38bdf8;   /* Sky-400 浅天蓝 (之前 #0284c7 700 深蓝) */
+
+  /* 折线调色板：整体柔和化，红改成浅珊瑚/浅玫瑰，不刺痛眼睛 */
+  --v2-chart-line-palette-1: #2dd4bf; /* Teal-400 */
+  --v2-chart-line-palette-2: #fda4af; /* Rose-300 浅粉玫瑰 (替代 Rose-700) */
+  --v2-chart-line-palette-3: #60a5fa; /* Blue-400 柔蓝 (替代 Sky-700) */
+  --v2-chart-line-palette-4: #94a3b8; /* Slate-400 */
+
+  /* 费用多色 Pastel 调色板（6 色循环，统一浅度/饱和度，和 UI 无冲突） */
+  --v2-chart-rainbow-1: #2dd4bf; /* Teal-400  浅青 */
+  --v2-chart-rainbow-2: #60a5fa; /* Blue-400  柔蓝 */
+  --v2-chart-rainbow-3: #a78bfa; /* Violet-400 浅紫 */
+  --v2-chart-rainbow-4: #34d399; /* Emerald-400 浅翡翠 */
+  --v2-chart-rainbow-5: #fb923c; /* Orange-400 浅橙 */
+  --v2-chart-rainbow-6: #f472b6; /* Pink-400  浅粉 */
+}
+
+/* ============================================================
+   深色模式: 延续本项目的夜航金气氛 (非 5180 重点，保持和谐即可)
+   ============================================================ */
+:root[data-theme="dark"][data-ui="v2"] {
+  /* Primary: 审核金 */
+  --v2-primary: #f59e0b;
+  --v2-primary-strong: #d97706;
+  --v2-primary-weak: rgba(245, 158, 11, .16);
+  --v2-primary-border: rgba(245, 158, 11, 0.4);
+
+  --v2-accent: #fbbf24;
+  --v2-accent-weak: rgba(251, 191, 36, 0.12);
+
+  /* Semantic */
+  --v2-success: #34d399;
+  --v2-success-weak: rgba(52, 211, 153, 0.14);
+  --v2-warning: #fbbf24;
+  --v2-warning-weak: rgba(251, 191, 36, 0.14);
+  --v2-danger: #fb7185;
+  --v2-danger-weak: rgba(251, 113, 133, 0.14);
+  --v2-info: #38bdf8;
+  --v2-purple: #c4b5fd;
+
+  /* Neutrals (夜航金) */
+  --v2-bg: #050607;
+  --v2-surface: #0d0f0f;
+  --v2-surface-2: #17110a;
+  --v2-surface-3: #1c1508;
+  --v2-border: rgba(245, 158, 11, .32);
+  --v2-border-strong: rgba(245, 158, 11, .48);
+  --v2-text: #fff7df;
+  --v2-text-2: #f5e9c3;
+  --v2-muted: #c5b892;
+  --v2-muted-2: #8a7e5e;
+
+  /* Filter & Control —— dark */
+  --v2-filter-bg: transparent;
+  --v2-control-bg: #0d0f0f;
+  --v2-control-surface: #17110a;
+  --v2-control-text: #fff7df;
+  --v2-dashboard-surface: transparent;
+  --v2-ai-modal-bg: #0d0f0f;
+  --v2-ai-soft-bg: rgba(23, 17, 10, .82);
+
+  /* Sidebar（深色延续） */
+  --v2-sidebar-bg: #0a0804;
+  --v2-sidebar-text: #d9cfb0;
+  --v2-sidebar-muted: #8a7e5e;
+  --v2-sidebar-active-bg: #f59e0b;
+  --v2-sidebar-active-text: #0b0d0f;
+  --v2-sidebar-active-indicator: #fbbf24;
+  --v2-sidebar-border: rgba(245, 158, 11, 0.22);
+  --v2-sidebar-divider: rgba(245, 158, 11, 0.2);
+
+  /* Right panel */
+  --v2-rightpanel-bg: #0d0f0f;
+  --v2-rightpanel-border: rgba(245, 158, 11, 0.28);
+
+  /* Glow */
+  --v2-glow: rgba(245, 158, 11, .35);
+  --v2-sidebar-active-glow: 0 4px 14px rgba(245, 158, 11, 0.24);
+
+  /* 语义装饰徽章（深色模式） */
+  --v2-chip-complete-bg: rgba(52, 211, 153, 0.12);
+  --v2-chip-complete-fg: #34d399;
+  --v2-chip-complete-border: rgba(52, 211, 153, 0.32);
+  --v2-chip-down-bg: rgba(245, 158, 11, 0.1);
+  --v2-chip-down-fg: #fbbf24;
+  --v2-chip-down-border: rgba(245, 158, 11, 0.28);
+  --v2-chip-drop-bg: rgba(251, 113, 133, 0.1);
+  --v2-chip-drop-fg: #fb7185;
+  --v2-chip-drop-border: rgba(251, 113, 133, 0.28);
+  --v2-chip-warn-bg: rgba(251, 191, 36, 0.14);
+  --v2-chip-warn-fg: #fbbf24;
+  --v2-chip-warn-border: rgba(251, 191, 36, 0.38);
+  --v2-chip-info-bg: rgba(56, 189, 248, 0.08);
+  --v2-chip-info-fg: #38bdf8;
+  --v2-chip-info-border: rgba(56, 189, 248, 0.3);
+  --v2-chip-tag-bg: rgba(52, 211, 153, 0.1);
+  --v2-chip-tag-fg: #34d399;
+  --v2-chip-tag-border: rgba(52, 211, 153, 0.32);
+  --v2-chip-purple-bg: rgba(196, 181, 253, 0.08);
+  --v2-chip-purple-fg: #c4b5fd;
+  --v2-chip-purple-border: rgba(196, 181, 253, 0.3);
+  --v2-chip-amber-bg: rgba(245, 158, 11, 0.12);
+  --v2-chip-amber-fg: #f59e0b;
+  --v2-chip-amber-border: rgba(245, 158, 11, 0.34);
+
+  /* 深色 Chart 配色：延续夜航金气氛，但整体变浅 + 玫瑰柔和化
+     - primary/主色条：浅金（不再是饱和的 Amber 500），避免在深色背景上"扎眼"
+     - danger：浅粉玫瑰 Rose-300（Rose-400 在夜航金偏暗背景下仍然醒目但不刺痛）
+     - success：Emerald-300 浅翡翠
+     - info：Sky-300 浅天蓝
+     折线调色板也浅一阶，红条改成浅玫瑰。
+  */
+  --v2-chart-bar-primary: #fbbf24;   /* Amber-400 浅金 */
+  --v2-chart-bar-secondary: #d6ccac; /* 暖米灰（比之前的 #c5b892 更浅） */
+  --v2-chart-bar-danger:  #fda4af;   /* Rose-300 浅粉玫瑰 */
+  --v2-chart-bar-success: #6ee7b7;   /* Emerald-300 */
+  --v2-chart-bar-info:    #7dd3fc;   /* Sky-300 浅天青 */
+
+  --v2-chart-line-palette-1: #fbbf24; /* 浅金 */
+  --v2-chart-line-palette-2: #fda4af; /* 浅玫瑰 */
+  --v2-chart-line-palette-3: #7dd3fc; /* 浅天蓝 */
+  --v2-chart-line-palette-4: #d6ccac; /* 暖米灰对比 */
+
+  /* 深色费用多色 Pastel：在夜航金背景下保持柔和但可辨 */
+  --v2-chart-rainbow-1: #fbbf24; /* 浅金 */
+  --v2-chart-rainbow-2: #7dd3fc; /* 浅天青 */
+  --v2-chart-rainbow-3: #c4b5fd; /* 浅紫 */
+  --v2-chart-rainbow-4: #6ee7b7; /* 浅翡翠 */
+  --v2-chart-rainbow-5: #fdba74; /* 浅橘 */
+  --v2-chart-rainbow-6: #f9a8d4; /* 浅粉 */
+}

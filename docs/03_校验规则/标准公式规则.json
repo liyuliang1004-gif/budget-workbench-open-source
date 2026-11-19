@@ -1,0 +1,67 @@
+{
+  "任务分解-金额": {
+    "description": "销售额相关公式检查",
+    "critical_ranges": [
+      {
+        "name": "月度销售额区域",
+        "range_hint": "根据表头1-12月自动识别",
+        "formula_type": "销售额=销量*平均销售单价",
+        "required": true,
+        "allow_manual_value": false,
+        "severity": "error"
+      }
+    ]
+  },
+  "任务分解-成本": {
+    "description": "成本额相关公式检查",
+    "critical_ranges": [
+      {
+        "name": "月度成本额区域",
+        "range_hint": "根据表头1-12月自动识别",
+        "formula_type": "成本额=销量*成本价",
+        "required": true,
+        "allow_manual_value": false,
+        "severity": "error"
+      }
+    ]
+  },
+  "费用预算": {
+    "description": "费用合计公式检查",
+    "critical_ranges": [
+      {
+        "name": "费用月度合计区域",
+        "range_hint": "根据费用预算表头自动识别",
+        "formula_type": "费用合计=费用明细汇总",
+        "required": false,
+        "allow_manual_value": true,
+        "severity": "warning"
+      }
+    ]
+  },
+  "利润分解表": {
+    "description": "利润和率类公式检查",
+    "critical_ranges": [
+      {
+        "name": "利润计算区域",
+        "range_hint": "根据利润分解表结构自动识别",
+        "formula_type": "利润=销售额-成本额-费用额",
+        "required": true,
+        "allow_manual_value": false,
+        "severity": "error"
+      }
+    ]
+  },
+  "预算价格表": {
+    "description": "价格相关公式和错误值检查",
+    "critical_ranges": [
+      {
+        "name": "价格关键区域",
+        "range_hint": "根据价格表关键字段自动识别",
+        "formula_type": "价格字段不得出现Excel错误值",
+        "required": false,
+        "allow_manual_value": true,
+        "severity": "error"
+      }
+    ]
+  }
+}

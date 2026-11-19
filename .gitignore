@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.env*
+!.env.example
+
+# Node
+node_modules/
+dist/
+build/
+release/
+*.spec
+
+# 本地 AI / 设计辅助工具缓存
+.agents/
+.impeccable/
+
+# 日志
+logs/
+*.log
+
+# 真实业务数据，不进入 Git
+/data/
+/templates/
+*.db
+*.db-*
+*.sqlite*
+*.xlsx
+*.xlsm
+*.xls
+*.csv
+*.tsv
+*.zip
+*.dmg
+*.exe
+
+# 临时文件
+.DS_Store
+*.tmp
+
+# API Key 和本地配置
+*.key
+*.secret
+*.pem
+*.p12
+*.pfx
+launcher.json
+system_settings.json
+shop_registry.json
+license.json
+*授权.json

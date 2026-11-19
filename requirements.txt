@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pandas
+openpyxl
+sqlalchemy
+pydantic
+python-multipart
+jinja2
+requests
+mcp==2.0.0
+pytest
+httpx2
+python-dotenv
+pyinstaller
